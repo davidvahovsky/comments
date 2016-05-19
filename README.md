@@ -19,8 +19,11 @@ http://127.0.0.1:8000/article/3/
 Na vytvorenie vzorových dát bol použitý script ktorého funkcionalita sa nachádza v súbore `script.py`.
 V tomto súbore sa dá nastaviť počet vygenerovaných článkov, počet komentárov na najvyššej úrovni a hĺbka vnorenia komentárov.
 Na vyplnenie atribútov vytváraných objektov článku a komentára bolo použité rozšírenie `faker`, ktoré umožňuje generovanie náhodného textu alebo mien.
+
 <a href="https://github.com/joke2k/faker/" target="_blank">Github repository</a>
+
 <a href="https://pypi.python.org/pypi/fake-factory" target="_blank">Python packages site</a>
+
 Tento script v cykle vytvorí článok a následne vytvorý k tomuto článku komentáre a k týmto komentárom ďalšie podkomentáre do vopred stanovenej hĺbky. Počet podkomentárov sa volí náhodne z intervalu 0 až počet komentárov na úrovni rodiča tohto komentára a to celé predelené dvomi.
 
 ##### Spustenie scriptu
