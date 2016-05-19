@@ -1,0 +1,25 @@
+{% load ajax %}
+{% url "comment_create" pk=article.id as add_page_url %}
+{% with article.id|stringformat:"s" as article_id %}
+{% with "pagediv_id_"|add:article_id as pagediv_id %}
+{% with "submit_button_id_"|add:article_id as submit_button_id %}
+{% get_commentloader add_page_url pagediv_id=pagediv_id submit_button_id=submit_button_id as commentloader %}
+<div>
+    <form id="{{ submit_button_id }}" method="POST" class="add-comment">
+        {% csrf_token %}
+        <textarea class="textarea" name="body" placeholder="Body of comment..." id="body"></textarea>
+        <span class="options">
+            <input class="form-text" type="text" name="nick" placeholder="Your nick" id="nick">
+            {{ commentloader.submit_button|safe }}
+        </span>
+    </form>
+    <script>
+        {{ commentloader.submit_button_script|safe }}
+    </script>
+    {{ commentloader.pagediv|safe }}
+    <div class="clear"></div>
+</div>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}

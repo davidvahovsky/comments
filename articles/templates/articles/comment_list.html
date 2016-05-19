@@ -1,0 +1,111 @@
+{% load staticfiles %}
+
+
+<div>
+    {% if page == 1 %}
+        <div>
+            {% with article as article %}
+                {% include "articles/add_comment.html" %}
+            {% endwith %}
+        </div>
+    {% endif %}
+    {% for item in comment_list %}
+        <div>
+            <div class="photo">
+                <img src="{% static 'images/default-user.png' %}">
+            </div>
+            <div class="comment">
+                <b>{{ item.nick }}</b> &nbsp;&nbsp;<span class="">{{ item.date_created }}</span>
+                <br><br>
+                {{ item.body }}
+                <br><br>
+                {% with item.id|stringformat:"s" as item_id %}
+                    {% with "comment_id_"|add:item_id as comment_id %}
+                        {% with "likebutton_id_"|add:item_id as likebutton_id %}
+                            {% with "dislikebutton_id_"|add:item_id as dislikebutton_id %}
+                                {% with item.likes|stringformat:"s" as item_likes %}
+                                    {% load ajax %}
+                                    {% url 'comment_like' pk=item.id as comment_like_url %}
+                                    {% url 'comment_dislike' pk=item.id as comment_dislike_url %}
+                                    {% get_likes comment_like_url comment_dislike_url comment_id=comment_id comment_likes=item_likes likebutton_id=likebutton_id dislikebutton_id=dislikebutton_id as commentlike %}
+                                    {% if item.likes == 0 %}
+                                        <span class="box grey">{{ commentlike.comment_id|safe }}</span>
+                                    {% elif item.likes > 0 %}
+                                        <span class="box green">{{ commentlike.comment_id|safe }}</span>
+                                    {% else %}
+                                        <span class="box red">{{ commentlike.comment_id|safe }}</span>
+                                    {% endif %}
+                                    <script>
+                                        jQuery(
+                                                function ($) {
+                                                    var cookies = document.cookie.split(/; */);
+                                                    for (var i=0; i < cookies.length; i++){
+                                                        var pair = cookies[i].split("=");
+                                                        if(pair[0].match("^span_id_")){
+                                                            var id_name = '#' + pair[0];
+                                                            if(Cookies.get(pair[0]) == 1){
+                                                                $(id_name).replaceWith("<span class='f-green liked'>Liked</span>");
+                                                            } else{
+                                                                $(id_name).replaceWith("<span class='f-red disliked'>Disliked</span>");
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                        )
+                                    </script>
+                                    <span id="span_id_{{ item_id }}">
+                                        {{ commentlike.likebutton_id|safe }}
+                                        {{ commentlike.dislikebutton_id|safe }}
+                                    </span>
+                                    {{ commentlike.pagination|safe }}
+                                    <script>
+                                        {{ commentlike.like_script|safe }}
+                                    </script>
+                                    <script>
+                                        {{ commentlike.dislike_script|safe }}
+                                    </script>
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endwith %}
+                {% endwith %}
+
+                <div>
+                    {% with item.id|stringformat:"s" as item_id %}
+                        {% with "pagediv_id_"|add:item_id as pagediv_id %}
+                            {% with "loadbutton_id_"|add:item_id as loadbutton_id %}
+                                {% with "pagination_id_"|add:item_id as pagination_id %}
+                                {% with "respondbutton_id_"|add:item_id as respondbutton_id %}
+                                    {% load ajax %}
+                                    {% url "sub_comment_list" pk=item.article.id com_pk=item.id as page_url %}
+                                    {% get_pageloader page_url pagediv_id=pagediv_id loadbutton_id=loadbutton_id pagination_id=pagination_id respondbutton_id=respondbutton_id as pageloader %}
+
+                                    <span class="text2 f-grey">{{ pageloader.respondbutton|safe }}</span>
+
+                                    {{ pageloader.pagediv|safe }}
+                                    {% if item.children.exists %}
+                                        {{ pageloader.loadbutton|safe }}
+                                    {% endif %}
+                                    {{ pageloader.pagination|safe }}
+                                    <script>
+                                        {{ pageloader.button_script|safe }}
+                                    </script>
+                                    <script>
+                                        {{ pageloader.respond_button_script|safe }}
+                                    </script>
+                                {% endwith %}
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endwith %}
+                </div>
+
+                <span class="text f-grey"></span>
+                <span class="text f-red"></span>
+                <br><br>
+            </div>
+        </div>
+    {% empty %}
+        <div>Nothing here</div>
+    {% endfor %}
+</div>

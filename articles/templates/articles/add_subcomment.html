@@ -1,0 +1,32 @@
+{% load ajax %}
+{% url "subcomment_create" pk=article.id com_pk=parent_comment.id as add_page_url %}
+{% with article.id|stringformat:"s" as article_id %}
+{% with parent_comment.id|stringformat:"s" as comment_id %}
+{% with "nick_"|add:article_id|add:"_"|add:comment_id as nick_id %}
+{% with "body_id_"|add:article_id|add:"_"|add:comment_id as body_id %}
+{% with "pagediv_id_"|add:article_id|add:"_"|add:comment_id as pagediv_id %}
+{% with "submit_button_id_"|add:article_id|add:"_"|add:comment_id as submit_button_id %}
+{% get_commentloader add_page_url nick_id=nick_id body_id=body_id pagediv_id=pagediv_id submit_button_id=submit_button_id as commentloader %}
+<div>
+    <span>Respond to <b>{{ parent_comment.nick }}</b>:</span><br><br>
+    <form id="{{ submit_button_id }}" method="POST" class="add-comment">
+        {% csrf_token %}
+        <textarea class="textarea" name="body" placeholder="Body of comment..." id="{{ body_id }}"></textarea>
+        <span class="options">
+            <input class="form-text" type="text" name="nick" placeholder="Your nick" id="{{ nick_id }}">
+            {{ commentloader.submit_button|safe }}
+        </span>
+    </form>
+    <script>
+        {{ commentloader.submit_button_script|safe }}
+    </script>
+    {{ commentloader.pagediv|safe }}
+    <div class="clear"></div>
+</div>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

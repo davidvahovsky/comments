@@ -1,0 +1,79 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/default.css' %}">
+    <link rel="stylesheet" href="{% static 'Font-Awesome-4.1.0/css/font-awesome.min.css' %}">
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="{% static 'js/ajax.js' %}"></script>
+    <script src="{% static 'js/jquery-cookie-master/src/jquery.cookie.js' %}"></script>
+    <script src="{% static 'js/js-cookie-1.5.1/src/js.cookie.js' %}"></script>
+</head>
+<body>
+    <div class="body">
+        <div class="container">
+            <h1>{{ article.title }}</h1>
+            Created: {{ article.date_created }} by <b>{{ article.author }}</b><br><br>
+            {{ article.body }}<br><br><br><br>
+        </div>
+
+        <div class="container">
+            <div class="title">Other articles</div>
+            <table class="articles">
+                <tr class="articles">
+                    {% for other in articles %}
+                        {% if other != article %}
+                            <td style="width: calc(100% / {{ articles_len }});" class="articles">
+                                <a href="{% url 'article_detail' pk=other.id %}">
+                                    <div class="articles-top">
+                                        <span class="articles-title">
+                                        {{ other.title }}<br><br>
+                                        </span>
+                                    </div>
+                                    <div class="articles-bottom">
+                                        <span class="articles-author">
+                                            {{ other.author }}<br>
+                                        </span>
+                                        <span class="articles-date">
+                                            <small>
+                                                {{ other.date_created }}<br>
+                                            </small>
+                                        </span>
+                                        <span class="articles-date">
+                                            <small>
+                                                ( Comments: {{ other.article_comments.all|length }} )<br>
+                                            </small>
+                                        </span>
+                                    </div>
+                                </a>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+
+        <br><br>
+
+        <div class="container">
+            <div class="title">Discussion</div>
+            <div class="comments-header">{{ total_comments }} comments</div>
+            <div class="cell">
+                {% load ajax %}
+                {% url "comment_list" pk=article.id as page_url %}
+                {% get_pageloader page_url as pageloader %}
+                {{ pageloader.pagediv|safe }}
+                {{ pageloader.loadbutton|safe }}
+                {{ pageloader.pagination|safe }}
+
+                <script>
+                    {{ pageloader.button_script|safe }}
+                </script>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
