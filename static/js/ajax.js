@@ -14,8 +14,7 @@ function load_page(
             $(loadbutton_id).replaceWith("<p></p>");
             $(respondbutton_id).replaceWith("");
         },
-        success: function(data){ // check if there is an additional page
-            // , disable load button if not
+        success: function(data){
             $.ajax({
                 async: true,
                 type: "HEAD",
@@ -32,7 +31,6 @@ function load_page(
                     $(loadbutton_id).prop("disabled", false);
                 }
             });
-            //console.log(data);
             $(pagediv_id).append($(data).find("div"));
         }
     });
@@ -71,8 +69,6 @@ function add_like(page_url, likebutton_id, comment_id, comment_likes){
     $.ajax({
         type: "GET",
         url: page_url,
-        //data: {'likes': likes},
-        //dataType: "json",
         error: function() {
         },
         success: function() {
@@ -99,8 +95,6 @@ function add_dislike(page_url, dislikebutton_id, comment_id, comment_likes){
     $.ajax({
         type: "GET",
         url: page_url,
-        //data: {'likes': likes},
-        //dataType: "json",
         error: function() {
         },
         success: function() {

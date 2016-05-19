@@ -5,6 +5,7 @@ application/__pycache__/*
 application/migrations/*
 articles/__pycache__/*
 articles/migrations/*
+articles/templatetags/__pycache__/*
 
 .DS_Store
 !.gitignore

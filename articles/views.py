@@ -1,14 +1,11 @@
 import json
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.http import JsonResponse
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.contrib import messages
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, UpdateView, RedirectView
+from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
-# from articles.forms import CommentCreateForm, ArticleCreateForm
 from articles.models import Article, Comment
 from django.views.generic.list import ListView
 
@@ -40,7 +37,6 @@ class CommentLikeView(RedirectView):
         comment = Comment.objects.get(pk=self.kwargs['pk'])
         comment.likes += 1
         comment.save()
-        # return JsonResponse({'likes': comment.likes})
         return self.request.META['HTTP_REFERER']
 
 
@@ -52,7 +48,6 @@ class CommentDislikeView(RedirectView):
         comment = Comment.objects.get(pk=self.kwargs['pk'])
         comment.likes -= 1
         comment.save()
-        # return JsonResponse({'likes': comment.likes})
         return self.request.META['HTTP_REFERER']
 
 
@@ -68,7 +63,8 @@ class CommentListView(ListView):
         except Article.DoesNotExist:
             article = None
         context = super(CommentListView, self).get_context_data(**kwargs)
-        comment_list = Comment.objects.filter(comment_id__isnull=True, article_id=self.kwargs['pk']).order_by("-date_created")
+        comment_list = Comment.objects.filter(comment_id__isnull=True, article_id=self.kwargs['pk']).order_by("-likes")
+        # comment_list = Comment.objects.filter(comment_id__isnull=True, article_id=self.kwargs['pk']).order_by("-date_created")
         paginator = Paginator(comment_list, self.paginate_by)
         page = self.request.GET.get('page')
         try:
@@ -102,7 +98,8 @@ class SubCommentListView(ListView):
         except Comment.DoesNotExist:
             parent_comment = None
         context = super(SubCommentListView, self).get_context_data(**kwargs)
-        comment_list = Comment.objects.filter(comment_id=self.kwargs['com_pk'], article_id=self.kwargs['pk']).order_by("-date_created")
+        comment_list = Comment.objects.filter(comment_id=self.kwargs['com_pk'], article_id=self.kwargs['pk']).order_by("-likes")
+        # comment_list = Comment.objects.filter(comment_id=self.kwargs['com_pk'], article_id=self.kwargs['pk']).order_by("-date_created")
         paginator = Paginator(comment_list, self.paginate_by)
         page = self.request.GET.get('page')
         try:
@@ -161,23 +158,17 @@ def comment_create(request, pk):
 
 @csrf_exempt
 def subcomment_create(request, pk, com_pk):
-    print("subcomment_create")
     try:
         article = Article.objects.get(id=pk)
-        print("article")
         try:
             parent_comment = Comment.objects.get(id=com_pk)
-            print("parent_comment")
             if request.method == 'POST':
-                print("POST")
                 post_nick = request.POST.get('nick')
                 post_body = request.POST.get('body')
                 if not post_nick:
                     return request.META['HTTP_REFERER']
-                print("nick")
                 if not post_body:
                     return request.META['HTTP_REFERER']
-                print("body")
                 comment = Comment(nick=post_nick, body=post_body, article=article, comment=parent_comment)
                 comment.save()
                 return render_to_response('articles/comment_detail.html',

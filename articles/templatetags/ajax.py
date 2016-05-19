@@ -23,28 +23,12 @@ def get_pageloader(page_url, *args, **kwargs):
     else:
         button = " sub"
     return {
-        # "pagediv": "<div class='comments' id='" + pagediv_id + "'></div>",
         "pagediv": "<" + page + " class='comments' id='" + pagediv_id + "'></" + page + ">",
         "respondbutton": "<button class='nothing2 f-grey' id='" + respondbutton_id + "' type='submit'>Respond</button>",
         "loadbutton": "<button class='center" + button + "' id='" + loadbutton_id + "' type='submit'>Show comments</button>",
         "pagination": "<input type='hidden' id='" + pagination_id + "' value='1'>",
         "button_script": button_script,
         "respond_button_script": respond_button_script,
-        }
-
-
-@register.assignment_tag(name="get_respondloader")
-def get_respondloader(page_url, *args, **kwargs):
-    pagediv_id = kwargs.get("pagediv_id", "pagediv-id")
-    respondbutton_id = kwargs.get("respondbutton_id", "respond-id")
-    pagination_id = kwargs.get("pagination_id", "pagination-id")
-    respond_button_script = """$("#%s").click(function(){load_respond("%s", "#%s", "#%s", "#%s");});""" % \
-                            (respondbutton_id, page_url, pagination_id, respondbutton_id, pagediv_id)
-    return {
-        "pagediv": "<p class='comments' id='" + pagediv_id + "'></p>",
-        "respondbutton": "<button class='nothing f-grey' id='" + respondbutton_id + "' type='submit'>Respond</button>",
-        "pagination": "<input type='hidden' id='" + pagination_id + "' value='1'>",
-        "button_script": respond_button_script,
         }
 
 
